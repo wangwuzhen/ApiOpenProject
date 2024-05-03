@@ -22,7 +22,7 @@ public class IceApiClient {
         this.accessKey = accessKey;
         this.secretKey = secretKey;
     }
-
+   
     private String accessKey;
     private String secretKey;
 
