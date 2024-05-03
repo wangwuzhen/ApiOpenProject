@@ -22,7 +22,7 @@ public class IceApiClient {
         this.accessKey = accessKey;
         this.secretKey = secretKey;
     }
-   
+
     private String accessKey;
     private String secretKey;
 
@@ -45,6 +45,7 @@ public class IceApiClient {
         return result;
 
     }
+
 private Map<String,String> getHeaderMap(String body){
         Map<String,String> hashMap=new HashMap<>();
         hashMap.put("accessKey",accessKey);
