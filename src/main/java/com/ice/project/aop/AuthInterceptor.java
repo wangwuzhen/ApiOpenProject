@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.ice.project.annotation.AuthCheck;
 import com.ice.project.common.ErrorCode;
 import com.ice.project.exception.BusinessException;
-import com.ice.project.model.entity.User;
+
+
+import com.ice.iceapicommon.model.entity.User;
 import com.ice.project.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;

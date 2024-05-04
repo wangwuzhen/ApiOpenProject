@@ -1,7 +1,13 @@
 package com.ice.icegateway;
 
+import com.ice.iceapicommon.model.entity.InterfaceInfo;
+import com.ice.iceapicommon.model.entity.User;
+import com.ice.iceapicommon.service.InnerInterfaceInfoService;
+import com.ice.iceapicommon.service.InnerUserInterfaceInfoService;
+import com.ice.iceapicommon.service.InnerUserService;
 import com.ice.iceclientsdk.utils.SignUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.reactivestreams.Publisher;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -31,6 +37,13 @@ import java.util.List;
 @Slf4j
 @Component
 public class CustomGlobalFilter implements GlobalFilter, Ordered {
+    @DubboReference
+    private InnerUserService innerUserService;
+    @DubboReference
+    private InnerInterfaceInfoService innerInterfaceInfoService;
+    @DubboReference
+    private InnerUserInterfaceInfoService innerUserInterfaceInfoService;
+
 
     private static final List<String> IP_WHITE_LIST= Arrays.asList("127.0.0.1");
     /**
@@ -49,8 +62,11 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         //1.请求日志
         ServerHttpRequest request = exchange.getRequest();
         log.info("请求唯一标识："+request.getId());
-        log.info("请求路径："+request.getPath());
-        log.info("请求方法："+request.getMethod());
+        String path = request.getPath().value();
+        log.info("请求路径："+ path);
+
+        String method = request.getMethod().toString();
+        log.info("请求方法："+ method);
         log.info("请求参数："+request.getQueryParams());
 
        String sourceAddress= request.getLocalAddress().getHostString();
@@ -71,10 +87,18 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
         String body = headers.getFirst("body");
         String sign=headers.getFirst("sign");
         //todo 实际是从数据库读取
-        if(!"ice".equals(accessKey)){
-           return handleNoAuth(response);
+       User invokeUser=null;
+        try {
+            invokeUser= innerUserService.getInvokeUser(accessKey);
+        } catch (Exception e) {
+            log.error("getInvokeUser error"+e);
         }
-        if (Long.parseLong(nonce)>10000) {
+        if (invokeUser==null){
+            return handleNoAuth(response);
+        }
+
+
+        if (Long.parseLong(nonce)>10000L) {
             return handleNoAuth(response);
         }
         //todo 时间和当前时间 不能超过5分钟
@@ -86,26 +110,36 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
 //        if (timestamp){
 //        }
         //todo 实际是从数据库中去查
-        String serverSign = SignUtils.genSign(body, "abcdefg");
-        if (!sign.equals(serverSign)){
-            throw new  RuntimeException("无权限");
+        String secretKey = invokeUser.getSecretKey();
+        String serveSign = SignUtils.genSign(body, secretKey);
+        if (sign==null || !sign.equals(serveSign)){
+            return  handleNoAuth(response);
         }
 
+        InterfaceInfo interfaceInfo=null;
         //请求的模拟接口是否存在(从数据库中查询模拟接口是否存在) todo
-
+        try {
+            interfaceInfo = innerInterfaceInfoService.getInterfaceInfo(path, method);
+        } catch (Exception e) {
+           log.error("getInterfaceInfo error"+e);
+        }
+        if (interfaceInfo==null){
+            return  handleNoAuth(response);
+        }
 
         //请求转发，调用模拟接口
         Mono<Void>filter=chain.filter(exchange);
         log.info("响应："+response.getStatusCode());
         //响应日志
 
-        return handleResponse(exchange,chain);
-
-//
-//        log.info("custom global filter");
-//        return filter;
+        return handleResponse(exchange,chain,interfaceInfo.getId(),invokeUser.getId());
     }
-    public Mono<Void> handleResponse(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+
+
+
+
+    public Mono<Void> handleResponse(ServerWebExchange exchange, GatewayFilterChain chain, long interfaceId, long userId) {
 
         try {
             // 获取原始应对象
@@ -133,7 +167,17 @@ public class CustomGlobalFilter implements GlobalFilter, Ordered {
                             // 返回一个处理后的响应体
                             // (这里就理解为它在拼接字符串,它把缓冲区的数据取出来，一点一点拼接好)
                             return super.writeWith(fluxBody.map(dataBuffer -> {
-                                //调用成功，接口调用次数+1
+
+
+                                //调用成功，接口调用次数+1'
+
+                                try {
+                                    innerUserInterfaceInfoService.invokeCount(interfaceId,userId);
+                                } catch (Exception e) {
+                                    log.error("invokeCount error"+e.getMessage());
+                                    throw new RuntimeException(e.getMessage());
+                                }
+
                                 // 读取响应体的内容并转换为字节数组
                                 byte[] content = new byte[dataBuffer.readableByteCount()];
                                 dataBuffer.read(content);

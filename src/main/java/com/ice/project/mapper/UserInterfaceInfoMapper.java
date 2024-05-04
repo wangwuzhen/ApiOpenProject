@@ -1,7 +1,9 @@
 package com.ice.project.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ice.project.model.entity.UserInterfaceInfo;
+import com.ice.iceapicommon.model.entity.UserInterfaceInfo;
+
+import java.util.List;
 
 
 /**
@@ -11,7 +13,8 @@ import com.ice.project.model.entity.UserInterfaceInfo;
 * @Entity generator.domain.UserInterfaceInfo
 */
 public interface UserInterfaceInfoMapper extends BaseMapper<UserInterfaceInfo> {
-
+    //select interfaceInfoId, sum(totalNum) as totalNum from user_interface_info group by interfaceInfoId order by totalNum desc limit 3;
+    List<UserInterfaceInfo> listTopInvokeInterfaceInfo(int limit);
 }
 
 

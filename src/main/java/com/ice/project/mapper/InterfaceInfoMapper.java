@@ -1,7 +1,8 @@
 package com.ice.project.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ice.project.model.entity.InterfaceInfo;
+import com.ice.iceapicommon.model.entity.InterfaceInfo;
+
 
 /**
 * @author HONOR

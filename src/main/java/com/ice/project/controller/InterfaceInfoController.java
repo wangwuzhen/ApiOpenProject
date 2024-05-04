@@ -3,6 +3,8 @@ package com.ice.project.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
+import com.ice.iceapicommon.model.entity.InterfaceInfo;
+import com.ice.iceapicommon.model.entity.User;
 import com.ice.iceclientsdk.client.IceApiClient;
 import com.ice.project.annotation.AuthCheck;
 import com.ice.project.common.*;
@@ -12,8 +14,7 @@ import com.ice.project.model.dto.interfaceinfo.InterfaceInfoAddRequest;
 import com.ice.project.model.dto.interfaceinfo.InterfaceInfoInvokeRequest;
 import com.ice.project.model.dto.interfaceinfo.InterfaceInfoQueryRequest;
 import com.ice.project.model.dto.interfaceinfo.InterfaceInfoUpdateRequest;
-import com.ice.project.model.entity.InterfaceInfo;
-import com.ice.project.model.entity.User;
+
 import com.ice.project.model.enums.InterfaceInfoStatusEnum;
 import com.ice.project.service.InterfaceInfoService;
 import com.ice.project.service.UserService;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 接口管理

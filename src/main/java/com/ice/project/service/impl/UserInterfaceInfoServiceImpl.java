@@ -1,15 +1,14 @@
 package com.ice.project.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ice.iceapicommon.model.entity.UserInterfaceInfo;
 import com.ice.project.common.ErrorCode;
 import com.ice.project.exception.BusinessException;
 import com.ice.project.mapper.UserInterfaceInfoMapper;
-import com.ice.project.model.entity.InterfaceInfo;
-import com.ice.project.model.entity.UserInterfaceInfo;
-import com.ice.project.service.UserInterfaceInfoService;
 
-import org.apache.commons.lang3.StringUtils;
+import com.ice.project.service.UserInterfaceInfoService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -35,7 +34,7 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
             }
         }
 
-        if (userinterfaceinfo.getLeftNum()<0) {
+        if (userinterfaceinfo.getLeftNum()<=0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "无调用次数");
         }
 
@@ -54,6 +53,16 @@ public class UserInterfaceInfoServiceImpl extends ServiceImpl<UserInterfaceInfoM
         if (interfaceInfoId<=0||userId<=0){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+        //查询数据库接口调用次数是否小于0
+        QueryWrapper<UserInterfaceInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("interfaceInfoId", interfaceInfoId);
+        queryWrapper.eq("userId", userId);
+        UserInterfaceInfo userInterfaceInfo = this.getOne(queryWrapper);
+        if (userInterfaceInfo.getLeftNum()<=0) {
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR,"无调用次数");
+        }
+
+
         UpdateWrapper<UserInterfaceInfo> updateWrapper=new UpdateWrapper<>();
         updateWrapper.eq("interfaceInfoId", interfaceInfoId);
         updateWrapper.eq("userId", userId);

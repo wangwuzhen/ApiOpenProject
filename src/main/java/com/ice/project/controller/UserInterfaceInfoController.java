@@ -2,8 +2,8 @@ package com.ice.project.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.gson.Gson;
-import com.ice.iceclientsdk.client.IceApiClient;
+import com.ice.iceapicommon.model.entity.User;
+import com.ice.iceapicommon.model.entity.UserInterfaceInfo;
 import com.ice.project.annotation.AuthCheck;
 import com.ice.project.common.*;
 import com.ice.project.constant.CommonConstant;
@@ -13,8 +13,7 @@ import com.ice.project.exception.BusinessException;
 import com.ice.project.model.dto.userinterfaceinfo.UserInterfaceInfoAddRequest;
 import com.ice.project.model.dto.userinterfaceinfo.UserInterfaceInfoQueryRequest;
 import com.ice.project.model.dto.userinterfaceinfo.UserInterfaceInfoUpdateRequest;
-import com.ice.project.model.entity.UserInterfaceInfo;
-import com.ice.project.model.entity.User;
+
 
 import com.ice.project.service.UserInterfaceInfoService;
 import com.ice.project.service.UserService;

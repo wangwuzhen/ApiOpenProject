@@ -1,7 +1,7 @@
 package com.ice.project.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.ice.project.model.entity.InterfaceInfo;
+import com.ice.iceapicommon.model.entity.InterfaceInfo;
 
 
 /**

@@ -2,7 +2,7 @@ package com.ice.project.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.ice.project.model.entity.User;
+import com.ice.iceapicommon.model.entity.User;
 
 import javax.servlet.http.HttpServletRequest;
 
